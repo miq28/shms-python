@@ -1,0 +1,28 @@
+[project]
+name = ""
+version = ""
+description = ""
+authors = [
+    {name = "", email = ""},
+]
+license-expression = "MIT"
+dependencies = [
+    "influxdb>=5.3.1",
+    "numpy>=1.22.3",
+    "pyinotify>=0.9.6",
+    "pandas>=1.4.2",
+    "paho-mqtt>=1.6.1",
+    "influxdb-client>=1.27.0",
+    "python-dotenv>=0.20.0",
+    "autopep8>=1.6.0",
+]
+requires-python = ">=3.10"
+
+[project.urls]
+Homepage = ""
+
+[tool.pdm]
+
+[build-system]
+requires = ["pdm-pep517>=0.12.0"]
+build-backend = "pdm.pep517.api"
