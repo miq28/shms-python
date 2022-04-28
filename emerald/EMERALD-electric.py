@@ -6,6 +6,7 @@ from datetime import datetime
 import pytz
 import re
 import json
+import math
 from typing import NamedTuple
 
 import paho.mqtt.client as mqtt
@@ -60,13 +61,18 @@ def _parse_mqtt_message(topic, payload):
         return MqttStatus(str(payload))
     elif re.match(MQTT_TOPIC_1, topic) or re.match(MQTT_TOPIC_2, topic):
         # print('Message match')
+        voltage = math.nan
+        ampere = math.nan
+        watt = math.nan
+        pstkwh = math.nan
+        heap = math.nan
         y = json.loads(payload)
-        voltage = y["voltage"]
-        ampere = y["ampere"]
-        watt = y["watt"]
-        pstkwh = y["pstkwh"]
-        heap = y["heap"]
-        return SensorData(float(voltage), float(ampere), float(watt), float(pstkwh), float(heap))
+        if "voltage" in y : voltage = float(y["voltage"])
+        if "ampere" in y : ampere = float(y["ampere"])
+        if "watt" in y : watt = float(y["watt"])
+        if "pstkwh" in y : pstkwh = float(y["pstkwh"])
+        if "heap" in y : heap = float(y["heap"])
+        return SensorData(voltage, ampere, watt, pstkwh, heap)
     else:
         return None
 
