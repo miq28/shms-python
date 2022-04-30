@@ -38,9 +38,10 @@ TOKEN = os.getenv('TOKEN_WIKA_LUKULO')
 ORG = os.getenv('ORG_WIKA_LUKULO')
 BUCKET = os.getenv('BUCKET_WIKA_LUKULO')
 
+TIMEZONE=7
+
 localFolder = [
-    '/home/shms/ftp/2004_wika_lukulo/BattTemp/',
-    # '/home/shms/ftp/2004_wika_lukulo/DMM/DMM_Data_2021-09-19.txt',
+    '/home/shms/ftp/2004_wika_lukulo/Event_LVDT/',
 ]
 
 # fileToCreate = localFolder + sensorType + '/' + sensorType + '.csv'
@@ -77,8 +78,8 @@ class MyEventHandler(pyinotify.ProcessEvent):
 
             fileName = event.pathname
 
-            if "BattTemp" in fileName:
-                sensorType = 'batttemp'
+            if "Event_LVDT" in fileName:
+                sensorType = 'eventLVDT'
             else:
                 print('Sensor type does not match.')
                 return
@@ -130,7 +131,7 @@ class MyEventHandler(pyinotify.ProcessEvent):
             # convert date string to datetime obj
             # df[KOLOM_DATE_TIME] = pd.to_datetime(df[KOLOM_DATE_TIME]) - timedelta(hours=0)
 
-            df.index = pd.to_datetime(df.index) - timedelta(hours=8)
+            df.index = pd.to_datetime(df.index) - timedelta(hours=TIMEZONE)
 
             # df.index = pd.to_datetime(df.index)
 
@@ -153,9 +154,17 @@ class MyEventHandler(pyinotify.ProcessEvent):
 
             # Convert multiple columns
             df = df.astype({
-                'Logger_Volt': 'float',
-                'Logger_Temp': 'float'
+                'Reading_Interval': 'int32',
+                'LVDT_volt': 'float',
+                'LVDT_mm_Raw': 'float',
+                'LVDT_mm_Calc': 'float'
             })
+
+            #tag from Columns value
+            tagColumns = [
+                # 'DMM_CurrentMode',
+                'Reading_Interval'
+            ]
 
             if (1 and len(df)):
                 print("Uploading [", event.pathname, "] to InfluxDB...")
@@ -222,10 +231,7 @@ class MyEventHandler(pyinotify.ProcessEvent):
                         bucket=BUCKET,
                         record=df,
                         data_frame_measurement_name=sensorType,
-                        data_frame_tag_columns=[
-                            # 'DMM_CurrentMode',
-                            # 'Reading_Interval'
-                        ]
+                        data_frame_tag_columns=tagColumns
                     )
 
                 end = time.time()
@@ -260,7 +266,7 @@ class MyEventHandler(pyinotify.ProcessEvent):
 
 
 def main():
-    print('BattTemp started')
+    print('EventLVDT started')
     # Watch manager (stores watches, you can add multiple dirs)
     wm = pyinotify.WatchManager()
     # User's music is in /tmp/music, watch recursively

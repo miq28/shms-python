@@ -38,6 +38,8 @@ TOKEN = os.getenv('TOKEN_WIKA_LUKULO')
 ORG = os.getenv('ORG_WIKA_LUKULO')
 BUCKET = os.getenv('BUCKET_WIKA_LUKULO')
 
+TIMEZONE=7
+
 localFolder = [
     '/home/shms/ftp/2004_wika_lukulo/DMM/',
     # '/home/shms/ftp/2004_wika_lukulo/DMM/DMM_Data_2021-09-19.txt',
@@ -139,7 +141,7 @@ class MyEventHandler(pyinotify.ProcessEvent):
             # convert date string to datetime obj
             # df[KOLOM_DATE_TIME] = pd.to_datetime(df[KOLOM_DATE_TIME]) - timedelta(hours=0)
 
-            df.index = pd.to_datetime(df.index) - timedelta(hours=8)
+            df.index = pd.to_datetime(df.index) - timedelta(hours=TIMEZONE)
 
             # df.index = pd.to_datetime(df.index)
 

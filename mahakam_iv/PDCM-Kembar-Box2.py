@@ -38,6 +38,8 @@ TOKEN=os.getenv('TOKEN_MAHAKAM_IV')
 ORG=os.getenv('ORG_MAHAKAM_IV')
 BUCKET=os.getenv('BUCKET_MAHAKAM_IV')
 
+TIMEZONE=8
+
 localFolder = [
     '/home/shms/ftp/2007-kembar-additional/vwsg/',
     '/home/shms/ftp/2007-kembar-additional/lvdt/',
@@ -132,7 +134,7 @@ class MyEventHandler(pyinotify.ProcessEvent):
             # convert date string to datetime obj
             # df[KOLOM_DATE_TIME] = pd.to_datetime(df[KOLOM_DATE_TIME]) - timedelta(hours=0)
 
-            df.index = pd.to_datetime(df.index) - timedelta(hours=8)
+            df.index = pd.to_datetime(df.index) - timedelta(hours=TIMEZONE)
 
             # df.index = pd.to_datetime(df.index)
 

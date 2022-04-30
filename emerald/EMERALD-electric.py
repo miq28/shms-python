@@ -31,6 +31,8 @@ MQTT_TOPIC_2 = 'ENERGYMETER_58C210/meterreading/60s'
 #MQTT_REGEX = 'ENERGYMETER_58C210/meterreading/60s'
 MQTT_CLIENT_ID = 'emerald_electric'
 
+TIMEZONE='Asia/Jakarta'
+
 client = InfluxDBClient(
     url=URL,
     token=TOKEN,
@@ -79,7 +81,7 @@ def _parse_mqtt_message(topic, payload):
 def _send_sensor_data_to_influxdb(topic, sensor_data):
     # date object of today's date
     local = datetime.now() # UTC
-    tz_Jakarta = pytz.timezone('Asia/Jakarta') 
+    tz_Jakarta = pytz.timezone(TIMEZONE) 
     now = datetime.now(tz_Jakarta)
     # print("Current year:", now.year)
     # print("Current month:", now.month)

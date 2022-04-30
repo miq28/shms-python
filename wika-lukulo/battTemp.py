@@ -33,18 +33,16 @@ pd.options.display.float_format = '{:.2f}'.format
 
 # sensorType = 'vwsg'
 
-URL = os.getenv("URL_MARTADIPURA")
-TOKEN = os.getenv('TOKEN_MARTADIPURA')
-ORG = os.getenv('ORG_MARTADIPURA')
-BUCKET = os.getenv('BUCKET_MARTADIPURA')
+URL = os.getenv("URL_WIKA_LUKULO")
+TOKEN = os.getenv('TOKEN_WIKA_LUKULO')
+ORG = os.getenv('ORG_WIKA_LUKULO')
+BUCKET = os.getenv('BUCKET_WIKA_LUKULO')
 
-TIMEZONE=8
+TIMEZONE=7
 
 localFolder = [
-    '/home/shms/ftp/2006_martadipura/VWSG/',
-    '/home/shms/ftp/2006_martadipura/DMM/',
-    '/home/shms/ftp/2006_martadipura/Miros/',
-    # '/home/shms/ftp/2006_martadipura/Diagnostic/',
+    '/home/shms/ftp/2004_wika_lukulo/BattTemp/',
+    # '/home/shms/ftp/2004_wika_lukulo/DMM/DMM_Data_2021-09-19.txt',
 ]
 
 # fileToCreate = localFolder + sensorType + '/' + sensorType + '.csv'
@@ -75,22 +73,14 @@ class MyEventHandler(pyinotify.ProcessEvent):
         # if event.pathname == '/home/shms/ftp/2004_wika_lukulo/DMM/test.txt':
 
         KOLOM_DATE_TIME = 'TIMESTAMP'
-
-        if event.pathname in fileList:
+        if event.pathname in fileList == False:
+            print('Path is not in the list')
+        else:
 
             fileName = event.pathname
 
-            if 'diag' in fileName and 'Strain' in fileName:
-                sensorType = 'diag_vwsg'
-            elif "VWSG" in fileName:
-                sensorType = 'vwsg'
-                fixtags = {"sensorType": "vwsg", "box": "1"}
-            elif "DMM" in fileName:
-                sensorType = 'dmm'
-                fixtags = {"sensorType": "dmm", "box": "1"}
-            elif "Miros" in fileName:
-                sensorType = 'miros'
-                fixtags = {"sensorType": "miros", "box": "1"}
+            if "BattTemp" in fileName:
+                sensorType = 'batttemp'
             else:
                 print('Sensor type does not match.')
                 return
@@ -163,6 +153,12 @@ class MyEventHandler(pyinotify.ProcessEvent):
 
             # s1.loc['b']
 
+            # Convert multiple columns
+            df = df.astype({
+                'Logger_Volt': 'float',
+                'Logger_Temp': 'float'
+            })
+
             if (1 and len(df)):
                 print("Uploading [", event.pathname, "] to InfluxDB...")
 
@@ -227,7 +223,11 @@ class MyEventHandler(pyinotify.ProcessEvent):
                     write_api.write(
                         bucket=BUCKET,
                         record=df,
-                        data_frame_measurement_name=sensorType
+                        data_frame_measurement_name=sensorType,
+                        data_frame_tag_columns=[
+                            # 'DMM_CurrentMode',
+                            # 'Reading_Interval'
+                        ]
                     )
 
                 end = time.time()
@@ -262,6 +262,7 @@ class MyEventHandler(pyinotify.ProcessEvent):
 
 
 def main():
+    print('BattTemp started')
     # Watch manager (stores watches, you can add multiple dirs)
     wm = pyinotify.WatchManager()
     # User's music is in /tmp/music, watch recursively
@@ -285,7 +286,7 @@ if __name__ == '__main__':
     # sched.start()
 
     # job.remove()
-    print('Martadipura started')
+
     # print(URL, TOKEN)
     main()
     # DropboxDownload()
