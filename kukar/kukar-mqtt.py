@@ -159,9 +159,8 @@ def parseCSIJSON(topic, json_str):
         final_dict[i]['time']=timeKeys[i]
         final_dict[i]['fields']=FIELDS[i]
     
-    print() 
-    print(final_dict)
-    print()   
+
+    logger.debug(final_dict)
 
     # print(json.dumps(json_body, indent=4))
     return final_dict
