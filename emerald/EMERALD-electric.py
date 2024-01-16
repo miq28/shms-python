@@ -25,9 +25,9 @@ MQTT_USER = os.getenv("MQTT_USER_EMERALD")
 MQTT_PASSWORD = os.getenv("MQTT_PASSWORD_EMERALD")
 # MQTT_TOPIC = 'home/+/+'
 # MQTT_REGEX = 'home/([^/]+)/([^/]+)'
-MQTT_TOPIC_LWT = 'ENERGYMETER_58C210/mqttstatus'
-MQTT_TOPIC_1 = 'ENERGYMETER_58C210/meterreading/1s'
-MQTT_TOPIC_2 = 'ENERGYMETER_58C210/meterreading/60s'
+MQTT_TOPIC_LWT = 'ENERGYMETER_03F245/mqttstatus'
+MQTT_TOPIC_1 = 'ENERGYMETER_03F245/meterreading/1s'
+MQTT_TOPIC_2 = 'ENERGYMETER_03F245/meterreading/60s'
 #MQTT_REGEX = 'ENERGYMETER_58C210/meterreading/60s'
 MQTT_CLIENT_ID = 'emerald_electric'
 

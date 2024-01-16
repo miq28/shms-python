@@ -1,0 +1,349 @@
+import os
+from dotenv import load_dotenv, dotenv_values
+load_dotenv('../.env')  # take environment variables from .env.
+config = dotenv_values('../.env')
+import datetime
+from datetime import datetime
+import pytz
+import re
+import json
+import math
+from typing import NamedTuple
+
+import paho.mqtt.client as mqtt
+# from influxdb import InfluxDBClient
+from influxdb_client import InfluxDBClient, Point, Dialect
+from influxdb_client.client.write_api import SYNCHRONOUS
+
+URL = os.getenv("URL_KUKAR")
+TOKEN = os.getenv('TOKEN_KUKAR')
+ORG = os.getenv('ORG_KUKAR')
+BUCKET_AUTOGEN = os.getenv('BUCKET_AUTOGEN_KUKAR')
+BUCKET_1_HOUR = os.getenv('BUCKET_1_HOUR_KUKAR')
+
+MQTT_ADDRESS = os.getenv("MQTT_ADDRESS_KUKAR")
+MQTT_USER = os.getenv("MQTT_USER_KUKAR")
+MQTT_PASSWORD = os.getenv("MQTT_PASSWORD_KUKAR")
+# MQTT_TOPIC = 'home/+/+'
+# MQTT_REGEX = 'home/([^/]+)/([^/]+)'
+MQTT_TOPIC_LWT = 'ENERGYMETER_03F245/mqttstatus'
+TOPIC_DMM_1s = 'cs/v1/data/cr1000x/50498/DMM_1s/cj'
+MQTT_TOPIC_2 = 'cs/v1/#'
+#MQTT_REGEX = 'ENERGYMETER_58C210/meterreading/60s'
+MQTT_CLIENT_ID = 'kukar-py'
+
+TIMEZONE='Asia/Makassar'
+
+client = InfluxDBClient(
+    url=URL,
+    token=TOKEN,
+    org=ORG
+)
+
+write_api = client.write_api(write_options=SYNCHRONOUS)
+
+class MqttStatus(NamedTuple):
+    mqttstatus: str
+    
+class SensorData(NamedTuple):
+    timestamp: str
+    vals: list
+
+def on_connect(client, userdata, flags, rc):
+    """ The callback for when the client receives a CONNACK response from the server."""
+    print('Connected with result code ' + str(rc))
+    client.subscribe(MQTT_TOPIC_LWT)
+    client.subscribe(TOPIC_DMM_1s)
+    client.subscribe(MQTT_TOPIC_2)
+
+def _parse_mqtt_message(topic, payload):
+    if re.match(MQTT_TOPIC_LWT, topic):
+        return MqttStatus(str(payload))
+    elif topic.startswith("cs/v1/data") and topic.endswith("/cj") and "LVDT_1s" in topic:
+        y = json.loads(payload)
+
+        # parse datalogger detail
+        station_name = y["head"]['environment']['station_name']
+        table_name = y['head']['environment']['table_name']
+        model = y['head']['environment']['model']
+        serial_no = y['head']['environment']['serial_no']
+        os_version = y['head']['environment']['os_version']
+        prog_name = y['head']['environment']['prog_name']
+        
+        # print(y["head"]['fields'])
+        keys = []
+        for k in y["head"]['fields']:
+            for v,z in k.items():
+                if v == 'name':
+                    # print(z)
+                    keys.append(z)
+        #     if k == 'name':
+        #         my_list.append(v)
+        print(keys)
+        
+        # parse sensor data
+        ts = y["data"][0]['time']       
+        
+        timeKeys = []
+        valsKeys = []
+        combined = []
+        
+        for k in y["data"]:
+            for v,z in k.items():
+                if v == 'time':
+                    
+                    strLen = len(z)
+                    if strLen > 19:
+                        A=26-strLen
+                        if A==1: z = z + '0'                
+                        elif A==2: z = z + '00'
+                        elif A==3: z = z + '000'
+                        elif A==4: z = z + '0000'
+                        elif A==5: z = z + '00000'
+                            
+                    receivedTs = datetime.fromisoformat(z)        
+                    
+                    ## Adding a timezone
+                    tzOrigin = pytz.timezone(TIMEZONE)
+                    tzServer = pytz.timezone("Asia/Jakarta") 
+                    # tzServer = pytz.timezone("UTC")
+                    
+                    # original timestamp yg diterima tidak ada info timezone
+                    # kita lekatkan timezone Makassar ke original timestamp
+                    # source: https://www.includehelp.com/python/datetime-astimezone-method-with-example.aspx
+                    dtOrigin = receivedTs.astimezone(tzOrigin)        
+                    dtConverted = dtOrigin.astimezone(tzServer)
+                    
+                    unixTs = dtConverted.timestamp()
+                    unixTs = math.floor(unixTs)-28800
+                    # d1=datetime.datetime(z, sgtTZObject)
+                    # d2 = d1.astimezone(sgtTZObject)
+                    
+                    timeKeys.append(unixTs*1000000000)
+                if v == 'vals':                    
+                    for i in range(len(z)):
+                        z[i]=float(z[i])
+                    valsKeys.append(z)
+                    testDict = dict(map(lambda i,j : (i,j) , keys,z))
+                    # testDict = list(map(lambda i,j : (i,j) , keys,z))
+                    combined.append(testDict)
+        # print(timeKeys)
+        
+        
+
+        
+        # for i in range(len(valsKeys)):
+        #     for j in range(len(valsKeys[j])):
+        
+        for i in range(len(combined)):
+            combined[i]['measurement']='BOX2'
+            combined[i]['time']=timeKeys[i]
+        print()
+        # print(valsKeys)
+        # print(timeKeys)
+        # print()
+        print(combined)
+        print()
+        
+        dict_structure  = [
+            {
+                'measurement': station_name,
+                'tags': {
+                    'table': table_name,
+                },
+                'fields': 
+                    {
+                    keys[0]: valsKeys[0][0],
+                    keys[1]: valsKeys[0][1],
+                    keys[2]: valsKeys[0][2],
+                    keys[3]: valsKeys[0][3]
+                },
+                'time': timeKeys[0],
+                # 'write_precision': 's'
+            },
+            {
+                'measurement': station_name,
+                'tags': {
+                    'table': table_name,
+                },
+                'fields': 
+                    {
+                    keys[0]: valsKeys[1][0],
+                    keys[1]: valsKeys[1][1],
+                    keys[2]: valsKeys[1][2],
+                    keys[3]: valsKeys[1][3]
+                },
+                'time': timeKeys[1],
+                # 'write_precision': 's'
+            },
+                        {
+                'measurement': station_name,
+                'tags': {
+                    'table': table_name,
+                },
+                'fields': 
+                    {
+                    keys[0]: valsKeys[2][0],
+                    keys[1]: valsKeys[2][1],
+                    keys[2]: valsKeys[2][2],
+                    keys[3]: valsKeys[2][3]
+                },
+                'time': timeKeys[2],
+                # 'write_precision': 's'
+            },
+                        {
+                'measurement': station_name,
+                'tags': {
+                    'table': table_name,
+                },
+                'fields': 
+                    {
+                    keys[0]: valsKeys[3][0],
+                    keys[1]: valsKeys[3][1],
+                    keys[2]: valsKeys[3][2],
+                    keys[3]: valsKeys[3][3]
+                },
+                'time': timeKeys[3],
+                # 'write_precision': 's'
+            },
+                        {
+                'measurement': station_name,
+                'tags': {
+                    'table': table_name,
+                },
+                'fields': 
+                    {
+                    keys[0]: valsKeys[4][0],
+                    keys[1]: valsKeys[4][1],
+                    keys[2]: valsKeys[4][2],
+                    keys[3]: valsKeys[4][3]
+                },
+                'time': timeKeys[4],
+                # 'write_precision': 's'
+            },
+        ]        
+        
+        print(dict_structure )
+        write_api.write(BUCKET_1_HOUR, ORG, dict_structure )
+        # write_api.write(BUCKET_1_HOUR, ORG, json_body,WritePrecision = 's')
+        
+        # testDict = dict(map(lambda i,j : (i,j) , keys,valsKeys))
+        # print(testDict)
+        
+        
+        val= y["data"][0]['vals']
+        for i in range(len(val)):
+            val[i]=float(val[i])
+        
+        # using map and dict type casting 
+        # to convert lists to dictionary
+        fieldsDict = dict(map(lambda i,j : (i,j) , keys,val))
+        # print(fieldsDict)
+        # print(ts)
+        # print(station_name, table_name)
+        
+        # datetime.fromisoformat() only accepts 3 or 6 decimal places for fractional seconds #95221
+        # therefore, we need to workaround it...
+        # issue: https://github.com/python/cpython/issues/95221
+        # fixed in python 3.11
+        strLen = len(ts)
+        if strLen > 19:
+            A=26-strLen
+            if A==1: ts = ts + '0'                
+            elif A==2: ts = ts + '00'
+            elif A==3: ts = ts + '000'
+            elif A==4: ts = ts + '0000'
+            elif A==5: ts = ts + '00000'
+                
+        receivedTs = datetime.fromisoformat(ts)        
+        
+        ## Adding a timezone
+        tzOrigin = pytz.timezone(TIMEZONE)
+        tzServer = pytz.timezone("Asia/Jakarta") 
+        # tzServer = pytz.timezone("UTC")
+        
+        # original timestamp yg diterima tidak ada info timezone
+        # kita lekatkan timezone Makassar ke original timestamp
+        # source: https://www.includehelp.com/python/datetime-astimezone-method-with-example.aspx
+        dtOrigin = receivedTs.astimezone(tzOrigin)        
+        dtConverted = dtOrigin.astimezone(tzServer)
+        
+        # print(dtOrigin, dtConverted)
+        
+        unixTs = dtConverted.timestamp()-28800
+        unixTs = math.floor(unixTs)
+        
+        fieldsDict["time"] = unixTs * 1000000000
+        
+        dict1 = {}
+        dict1["measurement"]=station_name
+        dict1["tags"]={"param": table_name}
+        dict1["fields"]=fieldsDict
+        # dict1['time_precision']='s'
+        
+        # print(dict1)
+        
+        # json_body = json.dumps(dict1, indent=4) 
+        # json_body = '[' + json_body + ']'
+        
+        json_body = []
+        json_body.append(dict1)
+        
+
+        # print(json.dumps(json_body, indent=4))
+        # return json_body
+
+    elif topic.startswith("cs/v1/state"):
+        print(topic)
+
+    elif re.match(TOPIC_DMM_1s, topic):
+        # print('Message match')
+        # voltage = math.nan
+        # ampere = math.nan
+        # watt = math.nan
+        # pstkwh = math.nan
+        # heap = math.nan
+        y = json.loads(payload)
+        if "data" in y :
+            timestamp = y["data"][0]['time']
+            val= y["data"][0]['vals']
+            # print('DMM_1s', timestamp, val)
+        # if "voltage" in y : voltage = float(y["voltage"])
+        # if "ampere" in y : ampere = float(y["ampere"])
+        # if "watt" in y : watt = float(y["watt"])
+        # if "pstkwh" in y : pstkwh = float(y["pstkwh"])
+        # if "heap" in y : heap = float(y["heap"])
+        # return SensorData(voltage, ampere, watt, pstkwh, heap)
+
+    else:
+        return None
+
+def _send_sensor_data_to_influxdb(topic, json_body):
+    if "LVDT_1s" in topic:
+        write_api.write(BUCKET_1_HOUR, ORG, json_body)
+        # write_api.write(BUCKET_AUTOGEN, ORG, json_body)
+
+def on_message(client, userdata, msg):
+    """The callback for when a PUBLISH message is received from the server."""
+    # print(msg.topic + ' ' + str(msg.payload))
+    sensor_data = _parse_mqtt_message(msg.topic, msg.payload.decode('utf-8'))
+    if sensor_data is not None:
+        _send_sensor_data_to_influxdb(msg.topic, sensor_data)
+        # print(msg.topic, sensor_data)
+        # print('Data sent to influxdb')
+
+def main():
+
+
+    mqtt_client = mqtt.Client(MQTT_CLIENT_ID)
+    mqtt_client.username_pw_set(MQTT_USER, MQTT_PASSWORD)
+    mqtt_client.on_connect = on_connect
+    mqtt_client.on_message = on_message
+
+    mqtt_client.connect(MQTT_ADDRESS, 1883)
+    mqtt_client.loop_forever()
+
+
+if __name__ == '__main__':
+    print('Kukar MQTT started')
+    main()

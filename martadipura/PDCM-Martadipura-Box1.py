@@ -108,6 +108,86 @@ class MyEventHandler(pyinotify.ProcessEvent):
                                     ))
 
             # print(cols)
+            
+            dataType={
+             #'Name': str,
+             #'Grade': int
+             'Strain_TempCorrected(1)': float,
+             'Strain_TempCorrected(2)': float,
+             'Strain_TempCorrected(3)': float,
+             'Strain_TempCorrected(4)': float,
+             'Strain_TempCorrected(5)': float,
+             'Strain_TempCorrected(6)': float,
+             'Strain_TempCorrected(7)': float,
+             'Strain_TempCorrected(8)': float,
+             'Strain_TempCorrected(9)': float,
+             'Strain_TempCorrected(10)': float,
+             'Strain_TempCorrected(11)': float,
+             'Strain_TempCorrected(12)': float,
+             'Strain_TempCorrected(13)': float,
+             'Strain_TempCorrected(14)': float,
+             'Strain_TempCorrected(15)': float,
+             'Strain_TempCorrected(16)': float,
+             'Strain_TempCorrected(17)': float,
+             'Strain_TempCorrected(18)': float,
+             'Strain_TempCorrected(19)': float,
+             'Strain_TempCorrected(20)': float,
+             'Strain_TempCorrected(21)': float,
+             'Strain_TempCorrected(22)': float,
+             
+             'TempC_Delta(1)': float,
+             'TempC_Delta(2)': float,
+             'TempC_Delta(3)': float,
+             'TempC_Delta(4)': float,
+             'TempC_Delta(5)': float,
+             'TempC_Delta(6)': float,
+             'TempC_Delta(7)': float,
+             'TempC_Delta(8)': float,
+             'TempC_Delta(9)': float,
+             'TempC_Delta(10)': float,
+             'TempC_Delta(11)': float,
+             'TempC_Delta(12)': float,
+             'TempC_Delta(13)': float,
+             'TempC_Delta(14)': float,
+             'TempC_Delta(15)': float,
+             'TempC_Delta(16)': float,
+             'TempC_Delta(17)': float,
+             'TempC_Delta(18)': float,
+             'TempC_Delta(19)': float,
+             'TempC_Delta(20)': float,
+             'TempC_Delta(21)': float,
+             
+             'TempC_Delta(22)': float,
+             'Strain_Delta(1)': float,
+             'Strain_Delta(2)': float,
+             'Strain_Delta(3)': float,
+             'Strain_Delta(4)': float,
+             'Strain_Delta(5)': float,
+             'Strain_Delta(6)': float,
+             'Strain_Delta(7)': float,
+             'Strain_Delta(8)': float,
+             'Strain_Delta(9)': float,
+             'Strain_Delta(10)': float,
+             'Strain_Delta(11)': float,
+             'Strain_Delta(12)': float,
+             'Strain_Delta(13)': float,
+             'Strain_Delta(14)': float,
+             'Strain_Delta(15)': float,
+             'Strain_Delta(16)': float,
+             'Strain_Delta(17)': float,
+             'Strain_Delta(18)': float,
+             'Strain_Delta(19)': float,
+             'Strain_Delta(20)': float,
+             'Strain_Delta(21)': float,
+             'Strain_Delta(22)': float,
+             
+             'DMM_1_Calculated': float,
+             
+             'MirosStatusCode': str,
+             'MirosDataQuality': float,
+             'MirosCorrection': float,
+             'AirGap': float
+            }
 
             df = pd.read_csv(fileName,
                              #  index_col=False,
@@ -116,6 +196,7 @@ class MyEventHandler(pyinotify.ProcessEvent):
                              #  parse_dates=True,
                              header=1,
                              # dtype = {'DMM_Calc': np.float64},
+                             dtype=dataType,
                              # names=['Employee', 'Hired','Salary', 'Sick Days'],
                              usecols=[i for i in cols if i != 'RECORD'],
                              skiprows=[2, 3],
@@ -162,6 +243,8 @@ class MyEventHandler(pyinotify.ProcessEvent):
             # ts = df_zero[KOLOM_DATE_TIME]
 
             # s1.loc['b']
+            
+            # df = df.astype(float)
 
             if (1 and len(df)):
                 print("Uploading [", event.pathname, "] to InfluxDB...")
