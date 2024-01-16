@@ -43,7 +43,7 @@ class CustomFormatter(logging.Formatter):
 
 # create logger with 'spam_application'
 logger = logging.getLogger(os.path.basename(__file__))
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.ERROR)
 
 # create console handler with a higher log level
 ch = logging.StreamHandler()
