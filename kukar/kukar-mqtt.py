@@ -2,8 +2,9 @@ import os
 from dotenv import load_dotenv, dotenv_values
 load_dotenv('../.env')  # take environment variables from .env.
 config = dotenv_values('../.env')
+import ciso8601
 import datetime
-from datetime import datetime
+from datetime import datetime, timezone
 import pytz
 import re
 import json
@@ -14,6 +15,44 @@ import paho.mqtt.client as mqtt
 # from influxdb import InfluxDBClient
 from influxdb_client import InfluxDBClient, Point, Dialect
 from influxdb_client.client.write_api import SYNCHRONOUS
+import logging
+
+class CustomFormatter(logging.Formatter):
+
+    grey = "\x1b[38;20m"
+    yellow = "\x1b[33;20m"
+    red = "\x1b[31;20m"
+    bold_red = "\x1b[31;1m"
+    reset = "\x1b[0m"
+    format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)"
+
+    FORMATS = {
+        logging.DEBUG: grey + format + reset,
+        logging.INFO: grey + format + reset,
+        logging.WARNING: yellow + format + reset,
+        logging.ERROR: red + format + reset,
+        logging.CRITICAL: bold_red + format + reset
+    }
+
+    def format(self, record):
+        log_fmt = self.FORMATS.get(record.levelno)
+        formatter = logging.Formatter(log_fmt)
+        return formatter.format(record)
+
+# create logger with 'spam_application'
+logger = logging.getLogger(os.path.basename(__file__))
+logger.setLevel(logging.DEBUG)
+
+# create console handler with a higher log level
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+
+ch.setFormatter(CustomFormatter())
+
+logger.addHandler(ch)
+
+# log = logging.getLogger("log")
+# logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.DEBUG)
 
 URL = os.getenv("URL_KUKAR")
 TOKEN = os.getenv('TOKEN_KUKAR')
@@ -32,7 +71,7 @@ MQTT_TOPIC_2 = 'cs/v1/#'
 #MQTT_REGEX = 'ENERGYMETER_58C210/meterreading/60s'
 MQTT_CLIENT_ID = 'kukar-py'
 
-TIMEZONE='Asia/Makassar'
+TZ_ORIGIN='Asia/Makassar'
 
 client = InfluxDBClient(
     url=URL,
@@ -57,123 +96,77 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe(MQTT_TOPIC_2)
 
 def _parse_mqtt_message(topic, payload):
-    if re.match(MQTT_TOPIC_LWT, topic):
-        return MqttStatus(str(payload))
-    elif "data" in topic and topic.startswith("cs/v1/") and topic.endswith("/cj"):
+    if "data" in topic and topic.startswith("cs/v1/") and topic.endswith("/cj"):
     # elif topic.startswith("cs/v1/data") and topic.endswith("/cj") and "LVDT_1s" in topic:
         y = json.loads(payload)
+        # print(json.dumps(y, indent=2))
 
-        # parse datalogger detail
+        # parse datalogger detail        
         station_name = y["head"]['environment']['station_name']
-        table_name = y['head']['environment']['table_name']
-        model = y['head']['environment']['model']
-        serial_no = y['head']['environment']['serial_no']
-        os_version = y['head']['environment']['os_version']
-        prog_name = y['head']['environment']['prog_name']
         
-        # print(y["head"]['fields'])
-        keys = []
+        MEASUREMEMENT={'measurement': station_name}    
+        TAGS = y["head"]['environment']
+        
+        sensorKeys = []
         for k in y["head"]['fields']:
             for v,z in k.items():
                 if v == 'name':
                     # print(z)
-                    keys.append(z)
-        #     if k == 'name':
-        #         my_list.append(v)
-        print(keys)
+                    sensorKeys.append(z)
+        # print(keys)
         
-        # parse sensor data
-        ts = y["data"][0]['time']       
+        # parse sensor data   
         
         timeKeys = []
-        valsKeys = []
-        combined = []
+        sensorVals = []
+        FIELDS = []
         
         for k in y["data"]:
             for v,z in k.items():
                 if v == 'time':
-                    
-                    strLen = len(z)
-                    if strLen > 19:
-                        A=26-strLen
-                        if A==1: z = z + '0'                
-                        elif A==2: z = z + '00'
-                        elif A==3: z = z + '000'
-                        elif A==4: z = z + '0000'
-                        elif A==5: z = z + '00000'
-                            
-                    receivedTs = datetime.fromisoformat(z)        
-                    
-                    ## Adding a timezone
-                    tzOrigin = pytz.timezone(TIMEZONE)
-                    tzServer = pytz.timezone("Asia/Jakarta") 
-                    # tzServer = pytz.timezone("UTC")
-                    
-                    # original timestamp yg diterima tidak ada info timezone
-                    # kita lekatkan timezone Makassar ke original timestamp
-                    # source: https://www.includehelp.com/python/datetime-astimezone-method-with-example.aspx
-                    dtOrigin = receivedTs.astimezone(tzOrigin)        
-                    dtConverted = dtOrigin.astimezone(tzServer)
-                    
-                    unixTs = dtConverted.timestamp()
-                    unixTs = math.floor(unixTs)-28800
-                    # d1=datetime.datetime(z, sgtTZObject)
-                    # d2 = d1.astimezone(sgtTZObject)
-                    
-                    timeKeys.append(unixTs*1000000000)
+                    # parse time string
+                    unaware = ciso8601.parse_datetime(z)                    
+                    # Create timezone object                    
+                    tzOriginObj = pytz.timezone(TZ_ORIGIN)                    
+                    ## Adding a timezone                    
+                    aware = tzOriginObj.localize(unaware)
+                    # insert tz aware datetime
+                    timeKeys.append(aware)
                 if v == 'vals':                    
                     for i in range(len(z)):
                         z[i]=float(z[i])
-                    valsKeys.append(z)
-                    testDict = dict(map(lambda i,j : (i,j) , keys,z))
-                    combined.append(testDict)
+                    sensorVals.append(z)
+                    testDict = dict(map(lambda i,j : (i,j) , sensorKeys,z))
+                    FIELDS.append(testDict)
         
-        # dict_structure=[]
-        # for i in range(len(combined)):
-        #     dict_structure.append({'fields':combined[i]})
-
-        # for i in range(len(dict_structure)):
-        #     dict_structure[i]['measurement']=station_name
-        #     dict_structure[i]['time']=timeKeys[i]
             
-        dict_structure=[]
+        final_dict=[]
         for i in range(len(timeKeys)):
-            dict_structure.append({'measurement':station_name})
-            dict_structure[i]['tags']={'table':table_name}
-            dict_structure[i]['time']=timeKeys[i]
-            dict_structure[i]['fields']=combined[i]
+            final_dict.append(MEASUREMEMENT)
+            final_dict[i]['tags']=TAGS
+            final_dict[i]['time']=timeKeys[i]            
+            final_dict[i]['fields']=FIELDS[i]
         
-        print() 
-        print(dict_structure)
-        print()   
+        logger.debug(final_dict)
 
-        # print(json.dumps(json_body, indent=4))
-        return dict_structure
+        return final_dict
 
-    elif topic.startswith("cs/v1/state"):
-        print(topic)
-
-    elif re.match(TOPIC_DMM_1s, topic):
-        # print('Message match')
-        # voltage = math.nan
-        # ampere = math.nan
-        # watt = math.nan
-        # pstkwh = math.nan
-        # heap = math.nan
-        y = json.loads(payload)
-        if "data" in y :
-            timestamp = y["data"][0]['time']
-            val= y["data"][0]['vals']
-            # print('DMM_1s', timestamp, val)
+    elif "state" in topic and topic.startswith("cs/v1/"):
+        logger.debug(topic)
+        
+    elif re.match(MQTT_TOPIC_LWT, topic):
+        return MqttStatus(str(payload))
+    
     else:
         return None
 
 def _send_sensor_data_to_influxdb(topic, dict_points):
-    # if "LVDT_1s" in topic:
     if "data" in topic and topic.startswith("cs/v1/") and topic.endswith("/cj"):
-        write_api.write(BUCKET_1_HOUR, ORG, dict_points)
-        # write_api.write(BUCKET_1_HOUR, ORG, dict_points,WritePrecision = 's')
-        # write_api.write(BUCKET_AUTOGEN, ORG, dict_points)
+        try:
+            write_api.write(BUCKET_1_HOUR, ORG, dict_points, WritePrecision = 's')
+            write_api.write(BUCKET_AUTOGEN, ORG, dict_points, WritePrecision = 's')
+        except Exception as e:
+            logger.error("Exception occurred", exc_info=True)
 
 def on_message(client, userdata, msg):
     """The callback for when a PUBLISH message is received from the server."""

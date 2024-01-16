@@ -13,6 +13,7 @@ import paho.mqtt.client as mqtt
 # from influxdb import InfluxDBClient
 from influxdb_client import InfluxDBClient, Point, Dialect
 from influxdb_client.client.write_api import SYNCHRONOUS
+import logging
 
 URL = os.getenv("URL_EMERALD")
 TOKEN = os.getenv('TOKEN_EMERALD')
