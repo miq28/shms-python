@@ -118,7 +118,15 @@ def parseCSIJSON(topic, json_str):
     prog_name = y['head']['environment']['prog_name']
     
     MEASUREMENT={'measurement': station_name}    
-    TAGS = y["head"]['environment']
+    # TAGS = y["head"]['environment']
+    TAGS = {
+        # 'station_name': station_name,
+        'model': model,
+        'serial_no': serial_no,
+        # 'os_version': os_version,
+        # 'prog_name': prog_name,
+        'table_name': table_name,
+    }
     
     sensorKeys = []
     for k in y["head"]['fields']:

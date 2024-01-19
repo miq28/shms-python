@@ -68,7 +68,7 @@ class MyEventHandler(pyinotify.ProcessEvent):
         # fileList = glob.glob('/home/shms/ftp/2004_wika_lukulo/DMM/test.txt')
         # print(fileList)
 
-        print("File closed::", event.pathname)
+        # print("File closed::", event.pathname)
         # if event.pathname == '/home/shms/ftp/2004_wika_lukulo/DMM/test.txt':
 
         KOLOM_DATE_TIME = 'TIMESTAMP'

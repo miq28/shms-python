@@ -9,6 +9,8 @@ load_dotenv('../.env')  # take environment variables from .env.
 # import dropbox
 # from influxdb import DataFrameClient
 # from influxdb import InfluxDBClient
+
+from minotaur import Inotify, Mask
 import ciso8601
 
 import asyncio
@@ -100,7 +102,7 @@ def my_date_parser(t):
     aware = tz_origin_obj.localize(ciso8601.parse_datetime(t))
     return aware
 
-def process_csijson(event):
+async def process_csijson(event):
     global job
     job += 1
     
@@ -157,27 +159,23 @@ def process_csijson(event):
 
         start = time.time()
 
-        client = InfluxDBClient(
-            url=URL,
-            token=TOKEN,
-            org=ORG
-        )
-
-        write_api = client.write_api(write_options=SYNCHRONOUS)
-        
         try:
-            write_api.write(
-                bucket=BUCKET,
-                record=df,
-                data_frame_measurement_name=MEASUREMENT,
-                data_frame_tag_columns=TAGS
-            )
+            async with InfluxDBClientAsync(
+                url=URL,
+                token=TOKEN,
+                org=ORG
+            ) as client:
+                await client.write_api().write(
+                    bucket=BUCKET,
+                    record=df,
+                    data_frame_measurement_name=MEASUREMENT,
+                    data_frame_tag_columns=TAGS
+                )
         except Exception as e:
-            logger.error("Exception occurred, send to influx failed", exc_info=True)
             if client is not None:
                 client.close()
-            
-                
+            logger.error("Exception occurred, send to influx failed", exc_info=True)
+
         end = time.time()
         diff = end - start
         # diff.total_seconds() * 1000
@@ -186,8 +184,8 @@ def process_csijson(event):
         """
         Close client
         """
-        if client is not None:
-            client.close()
+        # if client is not None:
+        #     client.close()
         
     else:
         logger.debug("No data is available")
@@ -215,10 +213,31 @@ class MyEventHandler(pyinotify.ProcessEvent):
     def process_IN_CLOSE_WRITE(self, event):
         """Function printing python version."""
         
-        process_csijson(event)
+        asyncio.run(process_csijson(event))
+
+        
+from pathlib import Path
+from typing import Generator, AsyncGenerator
+
+def get_directories_recursive(path: Path) -> Generator[Path, None, None]:
+    '''Recursively list all directories under path, including path itself, if
+    it's a directory.
+
+    The path itself is always yielded before its children are iterated, so you
+    can pre-process a path (by watching it with inotify) before you get the
+    directory listing.
+
+    Passing a non-directory won't raise an error or anything, it'll just yield
+    nothing.
+    '''
+
+    if path.is_dir():
+        yield path
+        for child in path.iterdir():
+            yield from get_directories_recursive(child)
 
 
-def main():  
+async def main():  
     # Watch manager (stores watches, you can add multiple dirs)
     wm = pyinotify.WatchManager()
     # User's music is in /tmp/music, watch recursively
@@ -230,12 +249,31 @@ def main():
     # Register the event handler with the notifier and listen for events
     notifier = pyinotify.AsyncNotifier(wm, eh)
     # notifier = pyinotify.ThreadedNotifier(wm, eh)
-    notifier.loop()
-
+    # notifier.loop()
     
-if __name__ == '__main__':
-    logger.info('kukar-csv.py started')
-    # main()
-    main()
 
+    with Inotify(blocking=False) as n:
+        # n.add_watch('/home/shms/ftp/2023-Kukar-Box1/VWSG/1s', Mask.CREATE | Mask.CLOSE_WRITE | Mask.MOVE)
+        # n.add_watch('/home/shms/ftp/2023-Kukar-Box1/VWSG/dynamic', Mask.CREATE | Mask.CLOSE_WRITE | Mask.MOVE)
+        path = Path('/home/shms/ftp/2023-Kukar-Box1')
+        for directory in get_directories_recursive(path):
+            print(f'INIT: watching {directory}')
+            n.add_watch(directory, Mask.CLOSE_WRITE)
+            
+        async for evt in n:            
+            # print(evt, evt.name)
+            event = {'name': evt.name, 'pathname': Path.joinpath(path, evt.name)}
+            print(event)
+            process_csijson(event)
+            
+try:
+    asyncio.run(main())
+except KeyboardInterrupt:
+    print('shutting down')
+    
+# if __name__ == '__main__':
+#     logger.info('kukar-csv.py started')
+#     # main()
+#     main()
+#     logger.info('notifier-loop started')
 

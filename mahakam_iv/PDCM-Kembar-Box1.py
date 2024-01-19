@@ -389,7 +389,7 @@ class MyEventHandler(pyinotify.ProcessEvent):
                 """
                 Close client
                 """
-                client.close()
+                # client.close()
 
 def on_connect(client, userdata, flags, rc):
     """ The callback for when the client receives a CONNACK response from the server."""

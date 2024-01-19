@@ -51,6 +51,14 @@ class SensorData(NamedTuple):
     watt: float
     pstkwh: float
     heap: float
+    
+# function to check for JSON String validity
+def is_validJSON(json_string):
+    # print("JSON String:", json_string)
+    try:
+        return json.loads(json_string)
+    except ValueError:
+        return None
 
 def on_connect(client, userdata, flags, rc):
     """ The callback for when the client receives a CONNACK response from the server."""
@@ -69,7 +77,12 @@ def _parse_mqtt_message(topic, payload):
         watt = math.nan
         pstkwh = math.nan
         heap = math.nan
-        y = json.loads(payload)
+        
+        y = is_validJSON(payload)
+        
+        if y is None:
+            return None
+        
         if "voltage" in y : voltage = float(y["voltage"])
         if "ampere" in y : ampere = float(y["ampere"])
         if "watt" in y : watt = float(y["watt"])
