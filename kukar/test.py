@@ -3,7 +3,7 @@
 # https://stackoverflow.com/questions/3258066/pyinotify-handling-in-modify-triggers
 
 import os
-from sys import stdout, stderr
+from sys import stdout
 from dotenv import load_dotenv
 load_dotenv('../.env')  # take environment variables from .env.
 # from apscheduler.schedulers.background import BackgroundScheduler
@@ -49,7 +49,7 @@ class CustomFormatter(logging.Formatter):
     bold_red = "\x1b[31;1m"
     reset = "\x1b[0m"
     # format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)"
-    format = "%(asctime)s-%(levelname)s-%(message)s-(%(filename)s:%(lineno)d)"
+    format = "%(asctime)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)"
     
 
     FORMATS = {
@@ -66,37 +66,28 @@ class CustomFormatter(logging.Formatter):
         return formatter.format(record)
 
 # create logger with 'spam_application'
-logging.root.handlers = []
-out_stream_handler = logging.StreamHandler(stdout)
-out_stream_handler.setLevel(logging.DEBUG)
-out_stream_handler.addFilter(lambda record: record.levelno <= logging.INFO)
-# out_stream_handler.setFormatter(CustomFormatter())
-
-err_stream_handler = logging.StreamHandler(stderr)
-err_stream_handler.setLevel(logging.WARNING)
-# err_stream_handler.setFormatter(CustomFormatter())
-
-logging.basicConfig(
-    level=logging.INFO,
-    datefmt="%Y-%m-%d %H:%M:%S %Z",
-    format='%(asctime)s - %(levelname)s - %(message)s - (%(filename)s:%(lineno)d)',
-    handlers=[out_stream_handler, err_stream_handler]
-)
-
-# add the handler to the root logger
-logging.getLogger('')
-
-# logging.debug('debug')
-# logging.info('info')
-# logging.warning('warning')
-# logging.error('error')
-# logging.exception('exp')
-
 logger = logging.getLogger(os.path.basename(__file__))
-# logger.setLevel(logging.INFO)
+logger.setLevel(logging.INFO)
 
+# create console handler with a higher log level
+ch = logging.StreamHandler(stdout)
+ch.setLevel(logging.DEBUG)
+
+ch.setFormatter(CustomFormatter())
+
+logger.addHandler(ch)
+# formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+# fh.setFormatter(formatter)
 pd.options.display.float_format = '{:.2f}'.format
+# pd.set_option("display.max_rows", None, "display.max_columns", None)
 
+# fileList = Path("/home/shms/ftp/2004_wika_lukulo/DMM").glob("DMM_Data*.txt")
+# for path in fileList:
+# print(path)
+
+# fileList = glob.glob('/home/shms/ftp/2004_wika_lukulo/DMM").glob("DMM_Data*.txt')
+
+# sensorType = 'vwsg'
 
 URL=os.getenv("URL_TEST")
 TOKEN=os.getenv('TOKEN_TEST')
@@ -406,12 +397,10 @@ async def main():
         # await task
 
 try:
-    # print('%s started' % os.path.basename(__file__))
-    logger.info('%s started', os.path.basename(__file__))
+    print('%s started' % os.path.basename(__file__))
     asyncio.run(main())
 except KeyboardInterrupt:
-    # print('shutting down')
-    logger.info('KeyboardInterrupt, shutting down...')
+    print('shutting down')
 except Exception as e:
-    logger.error("Exception occurred", exc_info=False)
+    logger.error("Exception occurred", exc_info=True)
 

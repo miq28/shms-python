@@ -1,0 +1,122 @@
+{
+    "/home/shms/ftp/2023-Kukar-Box1/BattTemp/10m/BattTemp_10m_2024_01.dat": {
+        "age": 1500.7,
+        "init": 1980,
+        "insert_date": "2024-01-28 11:30:09.558636+00:00",
+        "last": 1981
+    },
+    "/home/shms/ftp/2023-Kukar-Box1/LVDT/10m/LVDT_10m_2024_01.dat": {
+        "age": 1494.8,
+        "init": 1965,
+        "insert_date": "2024-01-28 11:30:15.446124+00:00",
+        "last": 1966
+    },
+    "/home/shms/ftp/2023-Kukar-Box1/LVDT/1m/LVDT_1m_2024_01.dat": {
+        "age": 0.0,
+        "init": 19809,
+        "insert_date": "2024-01-28 11:55:10.274598+00:00",
+        "last": 19847
+    },
+    "/home/shms/ftp/2023-Kukar-Box1/LVDT/1s/LVDT_1s_2024_01_28_18_00_00.dat": {
+        "age": 2.4,
+        "init": 4631,
+        "insert_date": "2024-01-28 11:55:07.840138+00:00",
+        "last": 6909
+    },
+    "/home/shms/ftp/2023-Kukar-Box1/LVDT/dynamic/LVDT_dynamic_2024_01_28_19_00_00.dat": {
+        "age": 4.9,
+        "init": 20950,
+        "insert_date": "2024-01-28 11:55:05.380509+00:00",
+        "last": 66150
+    },
+    "/home/shms/ftp/2023-Kukar-Box1/VWSG/10m/VWSG_10m_2024_01.dat": {
+        "age": 1498.3,
+        "init": 1980,
+        "insert_date": "2024-01-28 11:30:11.968689+00:00",
+        "last": 1981
+    },
+    "/home/shms/ftp/2023-Kukar-Box1/VWSG/10m/VWSG_Conversion_10m_2024_01.dat": {
+        "age": 1497.1,
+        "init": 1980,
+        "insert_date": "2024-01-28 11:30:13.188256+00:00",
+        "last": 1981
+    },
+    "/home/shms/ftp/2023-Kukar-Box1/VWSG/1m/VWSG_1m_2024_01.dat": {
+        "age": 1.2,
+        "init": 19787,
+        "insert_date": "2024-01-28 11:55:09.085422+00:00",
+        "last": 19825
+    },
+    "/home/shms/ftp/2023-Kukar-Box1/VWSG/1s/VWSG_1s_2024_01_28_18_00_00.dat": {
+        "age": 3.7,
+        "init": 4631,
+        "insert_date": "2024-01-28 11:55:06.594241+00:00",
+        "last": 6908
+    },
+    "/home/shms/ftp/2023-Kukar-Box1/VWSG/dynamic/VWSG_dynamic_2024_01_28_19_00_00.dat": {
+        "age": 6.2,
+        "init": 20950,
+        "insert_date": "2024-01-28 11:55:04.030388+00:00",
+        "last": 66150
+    },
+    "/home/shms/ftp/2023-Kukar-Box2/AmpSensor/10m/AmpSensor_10m_2024_01.dat": {
+        "age": 1490.9,
+        "init": 3850,
+        "insert_date": "2024-01-28 11:30:19.405001+00:00",
+        "last": 3851
+    },
+    "/home/shms/ftp/2023-Kukar-Box2/AmpSensor/1m/AmpSensor_1m_2024_01.dat": {
+        "age": 2.1,
+        "init": 38522,
+        "insert_date": "2024-01-28 11:55:08.200211+00:00",
+        "last": 38560
+    },
+    "/home/shms/ftp/2023-Kukar-Box2/Anemometer/10m/Anemometer_10m_2024_01.dat": {
+        "age": 1495.9,
+        "init": 3849,
+        "insert_date": "2024-01-28 11:30:14.418367+00:00",
+        "last": 3850
+    },
+    "/home/shms/ftp/2023-Kukar-Box2/Anemometer/1s/Anemometer_1s_2024_01_28_18_00_00.dat": {
+        "age": 5.9,
+        "init": 4633,
+        "insert_date": "2024-01-28 11:55:04.353575+00:00",
+        "last": 6905
+    },
+    "/home/shms/ftp/2023-Kukar-Box2/BattTemp/10m/BattTemp_10m_2024_01.dat": {
+        "age": 1499.4,
+        "init": 3713,
+        "insert_date": "2024-01-28 11:30:10.860484+00:00",
+        "last": 3714
+    },
+    "/home/shms/ftp/2023-Kukar-Box2/DMM/10m/DMM_10m_2024_01.dat": {
+        "age": 1497.0,
+        "init": 3323,
+        "insert_date": "2024-01-28 11:30:13.277996+00:00",
+        "last": 3324
+    },
+    "/home/shms/ftp/2023-Kukar-Box2/DMM/1m/DMM_1m_2024_01.dat": {
+        "age": 4.6,
+        "init": 38521,
+        "insert_date": "2024-01-28 11:55:05.649382+00:00",
+        "last": 38559
+    },
+    "/home/shms/ftp/2023-Kukar-Box2/DMM/1s/DMM_1s_2024_01_28_18_00_00.dat": {
+        "age": 7.2,
+        "init": 4637,
+        "insert_date": "2024-01-28 11:55:03.113079+00:00",
+        "last": 6909
+    },
+    "/home/shms/ftp/2023-Kukar-Box2/Thermocouple/10m/Thermocouple_10m_2024_01.dat": {
+        "age": 1493.4,
+        "init": 3688,
+        "insert_date": "2024-01-28 11:30:16.904861+00:00",
+        "last": 3689
+    },
+    "/home/shms/ftp/2023-Kukar-Box2/Thermocouple/1m/Thermocouple_1m_2024_01.dat": {
+        "age": 3.3,
+        "init": 38520,
+        "insert_date": "2024-01-28 11:55:06.966976+00:00",
+        "last": 38558
+    }
+}
