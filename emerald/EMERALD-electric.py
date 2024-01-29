@@ -1,4 +1,8 @@
 import os
+import sys
+from sys import stdout, stderr
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(parent_dir)
 from dotenv import load_dotenv
 load_dotenv('../.env')  # take environment variables from .env.
 import datetime
@@ -13,7 +17,12 @@ import paho.mqtt.client as mqtt
 # from influxdb import InfluxDBClient
 from influxdb_client import InfluxDBClient, Point, Dialect
 from influxdb_client.client.write_api import SYNCHRONOUS
+import logging_config
 import logging
+
+# logger = logging.getLogger(__name__)
+logger = logging.getLogger(os.path.basename(__file__))
+
 
 URL = os.getenv("URL_EMERALD")
 TOKEN = os.getenv('TOKEN_EMERALD')
@@ -24,15 +33,15 @@ BUCKET_1_HOUR = os.getenv('BUCKET_1_HOUR_EMERALD')
 MQTT_ADDRESS = os.getenv("MQTT_ADDRESS_EMERALD")
 MQTT_USER = os.getenv("MQTT_USER_EMERALD")
 MQTT_PASSWORD = os.getenv("MQTT_PASSWORD_EMERALD")
-# MQTT_TOPIC = 'home/+/+'
-# MQTT_REGEX = 'home/([^/]+)/([^/]+)'
+
 MQTT_TOPIC_LWT = 'ENERGYMETER_03F245/mqttstatus'
 MQTT_TOPIC_1 = 'ENERGYMETER_03F245/meterreading/1s'
 MQTT_TOPIC_2 = 'ENERGYMETER_03F245/meterreading/60s'
-#MQTT_REGEX = 'ENERGYMETER_58C210/meterreading/60s'
+
 MQTT_CLIENT_ID = 'emerald_electric'
 
 TIMEZONE='Asia/Jakarta'
+
 
 client = InfluxDBClient(
     url=URL,
@@ -54,15 +63,16 @@ class SensorData(NamedTuple):
     
 # function to check for JSON String validity
 def is_validJSON(json_string):
-    # print("JSON String:", json_string)
+    logger.debug("JSON String: %s", json_string)
     try:
         return json.loads(json_string)
-    except ValueError:
+    except ValueError as v:
+        logger.warning('%s, JSON is not valid [%s]', v, json_string)
         return None
 
 def on_connect(client, userdata, flags, rc):
     """ The callback for when the client receives a CONNACK response from the server."""
-    print('Connected with result code ' + str(rc))
+    logger.info('Connected with result code %i', rc)
     client.subscribe(MQTT_TOPIC_LWT)
     client.subscribe(MQTT_TOPIC_1)
     client.subscribe(MQTT_TOPIC_2)
@@ -81,6 +91,7 @@ def _parse_mqtt_message(topic, payload):
         y = is_validJSON(payload)
         
         if y is None:
+            logger.warning('Payload is not valid JSON')
             return None
         
         if "voltage" in y : voltage = float(y["voltage"])
@@ -93,17 +104,10 @@ def _parse_mqtt_message(topic, payload):
         return None
 
 def _send_sensor_data_to_influxdb(topic, sensor_data):
-    # date object of today's date
+    # create datetime object
     local = datetime.now() # UTC
     tz_Jakarta = pytz.timezone(TIMEZONE) 
     now = datetime.now(tz_Jakarta)
-    # print("Current year:", now.year)
-    # print("Current month:", now.month)
-    # print("Current monthStr:", now.strftime("%b")) 
-    # print("Current day:", now.day)
-    # print("Current hour:", now.hour)
-    # print("UTC:", local.strftime("%m/%d/%Y, %H:%M:%S"))
-    # print("Jakarta:", now.strftime("%m/%d/%Y, %H:%M:%S"))
     
     # print(sensor_data)
     if re.match(MQTT_TOPIC_LWT, topic):
@@ -118,8 +122,9 @@ def _send_sensor_data_to_influxdb(topic, sensor_data):
                 }
             }
         ]
-        write_api.write(BUCKET_AUTOGEN, ORG, json_body)
-        # print('LWT')
+        # write_api.write(BUCKET_AUTOGEN, ORG, json_body)
+        bucket_name = BUCKET_AUTOGEN
+
     elif re.match(MQTT_TOPIC_1, topic) or re.match(MQTT_TOPIC_2, topic):
         # print(sensor_data)
         json_body = [
@@ -135,7 +140,7 @@ def _send_sensor_data_to_influxdb(topic, sensor_data):
                     'week': now.strftime("%W"),
                 },
                 'fields': {
-                    'value': sensor_data.voltage
+                    'value': float(sensor_data.voltage)
                 }
             },
             {
@@ -150,7 +155,7 @@ def _send_sensor_data_to_influxdb(topic, sensor_data):
                     'week': now.strftime("%W"),
                 },
                 'fields': {
-                    'value': sensor_data.ampere
+                    'value': float(sensor_data.ampere)
                 }
             },
             {
@@ -165,7 +170,7 @@ def _send_sensor_data_to_influxdb(topic, sensor_data):
                     'week': now.strftime("%W"),
                 },
                 'fields': {
-                    'value': sensor_data.watt
+                    'value': float(sensor_data.watt)
                 }
             },
             {
@@ -180,7 +185,7 @@ def _send_sensor_data_to_influxdb(topic, sensor_data):
                     'week': now.strftime("%W"),
                 },
                 'fields': {
-                    'value': sensor_data.pstkwh
+                    'value': float(sensor_data.pstkwh)
                 }
             },
             {
@@ -195,33 +200,29 @@ def _send_sensor_data_to_influxdb(topic, sensor_data):
                     'week': now.strftime("%W"),
                 },
                 'fields': {
-                    'value': sensor_data.heap
+                    'value': float(sensor_data.heap)
                 }
             }
         ]
         if re.match(MQTT_TOPIC_1, topic):
-            # client.write_points(json_body, retention_policy='1_hour')
-            # retention 1 hour
-            write_api.write(BUCKET_1_HOUR, ORG, json_body)
-
-
-            # print('1s')
+            bucket_name = BUCKET_1_HOUR
         elif re.match(MQTT_TOPIC_2, topic):
-            # retention ionfinite
-            write_api.write(BUCKET_AUTOGEN, ORG, json_body)
-            # print('60s')
+            bucket_name = BUCKET_AUTOGEN
+            
+    try:
+        logger.debug('%s', topic)
+        write_api.write(bucket_name, ORG, json_body)
+    except Exception as e:
+        logger.error('%e', e)
 
 def on_message(client, userdata, msg):
     """The callback for when a PUBLISH message is received from the server."""
-    # print(msg.topic + ' ' + str(msg.payload))
+    logger.debug('message=[%s] payload=[%s]', msg.topic, str(msg.payload.decode('utf-8')))
     sensor_data = _parse_mqtt_message(msg.topic, msg.payload.decode('utf-8'))
     if sensor_data is not None:
         _send_sensor_data_to_influxdb(msg.topic, sensor_data)
-        # print('Data sent to influxdb')
 
 def main():
-
-
     mqtt_client = mqtt.Client(MQTT_CLIENT_ID)
     mqtt_client.username_pw_set(MQTT_USER, MQTT_PASSWORD)
     mqtt_client.on_connect = on_connect
@@ -231,6 +232,13 @@ def main():
     mqtt_client.loop_forever()
 
 
-if __name__ == '__main__':
-    print('MQTT Emerald Electric')
+try:
+    # print('%s started' % os.path.basename(__file__))
+    logger.info('%s started', os.path.basename(__file__))
+    # asyncio.run(main())
     main()
+except KeyboardInterrupt:
+    # print('shutting down')
+    logger.info('KeyboardInterrupt, shutting down...')
+except Exception as e:
+    logger.error("Exception occurred", exc_info=False)

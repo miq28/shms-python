@@ -1,122 +1,134 @@
 {
     "/home/shms/ftp/2023-Kukar-Box1/BattTemp/10m/BattTemp_10m_2024_01.dat": {
-        "age": 249.9,
+        "age": 561.3,
         "init": 1990,
-        "insert_date": "2024-01-28 15:30:01.248985+00:00",
-        "last": 2005
+        "insert_date": "2024-01-29 06:00:13.023309+00:00",
+        "last": 2092
     },
     "/home/shms/ftp/2023-Kukar-Box1/LVDT/10m/LVDT_10m_2024_01.dat": {
-        "age": 244.3,
+        "age": 555.8,
         "init": 1975,
-        "insert_date": "2024-01-28 15:30:06.904058+00:00",
-        "last": 1990
+        "insert_date": "2024-01-29 06:00:18.566613+00:00",
+        "last": 2077
     },
     "/home/shms/ftp/2023-Kukar-Box1/LVDT/1m/LVDT_1m_2024_01.dat": {
-        "age": 56.3,
+        "age": 30.0,
         "init": 19849,
-        "insert_date": "2024-01-28 15:33:14.919854+00:00",
-        "last": 20065
+        "insert_date": "2024-01-29 06:09:04.318725+00:00",
+        "last": 20941
     },
-    "/home/shms/ftp/2023-Kukar-Box1/LVDT/1s/LVDT_1s_2024_01_28_18_00_00.dat": {
-        "age": 11.3,
-        "init": 6941,
-        "insert_date": "2024-01-28 15:33:59.900554+00:00",
-        "last": 20041
+    "/home/shms/ftp/2023-Kukar-Box1/LVDT/1s/LVDT_1s_2024_01_29_12_00_00.dat": {
+        "age": 0.0,
+        "init": 14,
+        "insert_date": "2024-01-29 06:09:34.349984+00:00",
+        "last": 7775
     },
-    "/home/shms/ftp/2023-Kukar-Box1/LVDT/dynamic/LVDT_dynamic_2024_01_28_23_00_00.dat": {
-        "age": 13.6,
-        "init": 430,
-        "insert_date": "2024-01-28 15:33:57.627879+00:00",
-        "last": 40700
+    "/home/shms/ftp/2023-Kukar-Box1/LVDT/dynamic/LVDT_dynamic_2024_01_29_13_00_00.dat": {
+        "age": 578.7,
+        "init": 410,
+        "insert_date": "2024-01-29 05:59:55.624772+00:00",
+        "last": 72060
+    },
+    "/home/shms/ftp/2023-Kukar-Box1/LVDT/dynamic/LVDT_dynamic_2024_01_29_14_00_00.dat": {
+        "age": 2.3,
+        "init": 290,
+        "insert_date": "2024-01-29 06:09:32.048039+00:00",
+        "last": 11530
     },
     "/home/shms/ftp/2023-Kukar-Box1/VWSG/10m/VWSG_10m_2024_01.dat": {
-        "age": 247.8,
+        "age": 559.1,
         "init": 1990,
-        "insert_date": "2024-01-28 15:30:03.405788+00:00",
-        "last": 2005
+        "insert_date": "2024-01-29 06:00:15.217763+00:00",
+        "last": 2092
     },
     "/home/shms/ftp/2023-Kukar-Box1/VWSG/10m/VWSG_Conversion_10m_2024_01.dat": {
-        "age": 246.6,
+        "age": 558.0,
         "init": 1990,
-        "insert_date": "2024-01-28 15:30:04.543361+00:00",
-        "last": 2005
+        "insert_date": "2024-01-29 06:00:16.383713+00:00",
+        "last": 2092
     },
     "/home/shms/ftp/2023-Kukar-Box1/VWSG/1m/VWSG_1m_2024_01.dat": {
-        "age": 57.4,
+        "age": 31.2,
         "init": 19827,
-        "insert_date": "2024-01-28 15:33:13.782784+00:00",
-        "last": 20043
+        "insert_date": "2024-01-29 06:09:03.127641+00:00",
+        "last": 20919
     },
-    "/home/shms/ftp/2023-Kukar-Box1/VWSG/1s/VWSG_1s_2024_01_28_18_00_00.dat": {
-        "age": 12.4,
-        "init": 6956,
-        "insert_date": "2024-01-28 15:33:58.773990+00:00",
-        "last": 20041
+    "/home/shms/ftp/2023-Kukar-Box1/VWSG/1s/VWSG_1s_2024_01_29_12_00_00.dat": {
+        "age": 1.2,
+        "init": 15,
+        "insert_date": "2024-01-29 06:09:33.192529+00:00",
+        "last": 7776
     },
-    "/home/shms/ftp/2023-Kukar-Box1/VWSG/dynamic/VWSG_dynamic_2024_01_28_23_00_00.dat": {
-        "age": 0.0,
-        "init": 440,
-        "insert_date": "2024-01-28 15:34:11.178575+00:00",
-        "last": 41010
+    "/home/shms/ftp/2023-Kukar-Box1/VWSG/dynamic/VWSG_dynamic_2024_01_29_13_00_00.dat": {
+        "age": 580.0,
+        "init": 320,
+        "insert_date": "2024-01-29 05:59:54.381577+00:00",
+        "last": 72070
+    },
+    "/home/shms/ftp/2023-Kukar-Box1/VWSG/dynamic/VWSG_dynamic_2024_01_29_14_00_00.dat": {
+        "age": 3.7,
+        "init": 290,
+        "insert_date": "2024-01-29 06:09:30.604034+00:00",
+        "last": 11520
     },
     "/home/shms/ftp/2023-Kukar-Box2/AmpSensor/10m/AmpSensor_10m_2024_01.dat": {
-        "age": 240.7,
+        "age": 558.6,
         "init": 3861,
-        "insert_date": "2024-01-28 15:30:10.453795+00:00",
-        "last": 3875
+        "insert_date": "2024-01-29 06:00:15.770846+00:00",
+        "last": 3962
     },
     "/home/shms/ftp/2023-Kukar-Box2/AmpSensor/1m/AmpSensor_1m_2024_01.dat": {
-        "age": 3.9,
+        "age": 25.2,
         "init": 38561,
-        "insert_date": "2024-01-28 15:34:07.312415+00:00",
-        "last": 38779
+        "insert_date": "2024-01-29 06:09:09.192217+00:00",
+        "last": 39654
     },
     "/home/shms/ftp/2023-Kukar-Box2/Anemometer/10m/Anemometer_10m_2024_01.dat": {
-        "age": 844.8,
+        "age": 563.0,
         "init": 3859,
-        "insert_date": "2024-01-28 15:20:06.394730+00:00",
-        "last": 3873
+        "insert_date": "2024-01-29 06:00:11.301328+00:00",
+        "last": 3961
     },
-    "/home/shms/ftp/2023-Kukar-Box2/Anemometer/1s/Anemometer_1s_2024_01_28_18_00_00.dat": {
-        "age": 7.5,
-        "init": 12,
-        "insert_date": "2024-01-28 15:34:03.709578+00:00",
-        "last": 20034
+    "/home/shms/ftp/2023-Kukar-Box2/Anemometer/1s/Anemometer_1s_2024_01_29_12_00_00.dat": {
+        "age": 0.3,
+        "init": 13,
+        "insert_date": "2024-01-29 06:09:34.043973+00:00",
+        "last": 7773
     },
     "/home/shms/ftp/2023-Kukar-Box2/BattTemp/10m/BattTemp_10m_2024_01.dat": {
-        "age": 248.9,
+        "age": 566.7,
         "init": 3723,
-        "insert_date": "2024-01-28 15:30:02.315864+00:00",
-        "last": 3738
+        "insert_date": "2024-01-29 06:00:07.617299+00:00",
+        "last": 3825
     },
     "/home/shms/ftp/2023-Kukar-Box2/DMM/10m/DMM_10m_2024_01.dat": {
-        "age": 246.5,
+        "age": 564.2,
         "init": 3333,
-        "insert_date": "2024-01-28 15:30:04.641197+00:00",
-        "last": 3348
+        "insert_date": "2024-01-29 06:00:10.107462+00:00",
+        "last": 3435
     },
     "/home/shms/ftp/2023-Kukar-Box2/DMM/1m/DMM_1m_2024_01.dat": {
-        "age": 6.3,
+        "age": 27.7,
         "init": 38561,
-        "insert_date": "2024-01-28 15:34:04.888927+00:00",
-        "last": 38778
+        "insert_date": "2024-01-29 06:09:06.689691+00:00",
+        "last": 39653
     },
-    "/home/shms/ftp/2023-Kukar-Box2/DMM/1s/DMM_1s_2024_01_28_18_00_00.dat": {
-        "age": 8.6,
-        "init": 6938,
-        "insert_date": "2024-01-28 15:34:02.535624+00:00",
-        "last": 20049
+    "/home/shms/ftp/2023-Kukar-Box2/DMM/1s/DMM_1s_2024_01_29_12_00_00.dat": {
+        "age": 1.5,
+        "init": 13,
+        "insert_date": "2024-01-29 06:09:32.865368+00:00",
+        "last": 7781
     },
     "/home/shms/ftp/2023-Kukar-Box2/Thermocouple/10m/Thermocouple_10m_2024_01.dat": {
-        "age": 243.1,
+        "age": 560.7,
         "init": 3698,
-        "insert_date": "2024-01-28 15:30:08.064725+00:00",
-        "last": 3713
+        "insert_date": "2024-01-29 06:00:13.606471+00:00",
+        "last": 3800
     },
     "/home/shms/ftp/2023-Kukar-Box2/Thermocouple/1m/Thermocouple_1m_2024_01.dat": {
-        "age": 5.1,
+        "age": 26.4,
         "init": 38559,
-        "insert_date": "2024-01-28 15:34:06.062040+00:00",
-        "last": 38777
+        "insert_date": "2024-01-29 06:09:07.954034+00:00",
+        "last": 39652
     }
 }
