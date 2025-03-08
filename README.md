@@ -25,3 +25,17 @@ sudo env PATH=$PATH:/home/shms/.nvm/versions/node/v14.19.1/bin /home/shms/.nvm/v
 [PM2] Saving current process list...
 [PM2] Successfully saved in /home/shms/.pm2/dump.pm2
 ```
+## OTHERS
+```
+▶ pm2 start kukar-mqtt.py --name "PDCM Kukar MQTT" --interpreter python3
+▶ pm2 start kukar-csv.py --name "Campbell CSV" --interpreter python3
+▶ pm2 start kukar-csv.py --name "Campbell CSV" --interpreter python3 --time
+▶ pm2 start kukar-mqtt.py --name "PDCM Kukar MQTT" --interpreter python3 --time
+▶ pm2 start PDCM-SungaiPute.py --name "PDCM Sungai Pute" --interpreter python3 --time --watch
+▶ pm2 start PDCM-Kembar-Box1.py --name PDCM-Kembar-Box1 --interpreter python3
+▶ pm2 start PDCM-Kudus.py --watch
+▶ pm2 start index.py --name "Wika Lukulo" --watch
+▶ pm2 start EMERALD-electric.py --name "Emerald Electric" --watch
+▶ pm2 start PDCM-Martadipura-Box1.py --watch
+▶ pm2 start PDCM-Kembar-Box2.py --watch
+```
