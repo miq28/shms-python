@@ -28,7 +28,9 @@ class CustomFormatter(logging.Formatter):
     red = "\x1b[31;20m"
     bold_red = "\x1b[31;1m"
     reset = "\x1b[0m"
-    format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)"
+    # format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)"
+    format = "%(asctime)s-%(levelname)s-%(message)s-(%(filename)s:%(lineno)d)"
+    
 
     FORMATS = {
         logging.DEBUG: grey + format + reset,
@@ -40,20 +42,38 @@ class CustomFormatter(logging.Formatter):
 
     def format(self, record):
         log_fmt = self.FORMATS.get(record.levelno)
-        formatter = logging.Formatter(log_fmt)
+        formatter = logging.Formatter(log_fmt, datefmt="%Y-%m-%d %H:%M:%S %Z")
         return formatter.format(record)
 
-# logger = logging.getLogger(__name__)
+# create logger with 'spam_application'
+logging.root.handlers = []
+out_stream_handler = logging.StreamHandler(stdout)
+out_stream_handler.setLevel(logging.DEBUG)
+out_stream_handler.addFilter(lambda record: record.levelno <= logging.INFO)
+# out_stream_handler.setFormatter(CustomFormatter())
+
+err_stream_handler = logging.StreamHandler(stderr)
+err_stream_handler.setLevel(logging.WARNING)
+# err_stream_handler.setFormatter(CustomFormatter())
+
+logging.basicConfig(
+    level=logging.INFO,
+    datefmt="%Y-%m-%d %H:%M:%S %Z",
+    format='%(asctime)s - %(levelname)s - %(message)s - (%(filename)s:%(lineno)d)',
+    handlers=[out_stream_handler, err_stream_handler]
+)
+
+# add the handler to the root logger
+logging.getLogger('')
+
+# logging.debug('debug')
+# logging.info('info')
+# logging.warning('warning')
+# logging.error('error')
+# logging.exception('exp')
+
 logger = logging.getLogger(os.path.basename(__file__))
-logger.setLevel(logging.INFO)
-
-# create console handler with a higher log level
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
-
-ch.setFormatter(CustomFormatter())
-
-logger.addHandler(ch)
+# logger.setLevel(logging.INFO)
 
 URL = os.getenv("URL_EMERALD")
 TOKEN = os.getenv('TOKEN_EMERALD')
@@ -272,4 +292,4 @@ except KeyboardInterrupt:
     # print('shutting down')
     logger.info('KeyboardInterrupt, shutting down...')
 except Exception as e:
-    logger.error("Exception occurred", exc_info=False)
+    logger.error("Exception occurred", exc_info=True)
