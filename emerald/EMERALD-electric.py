@@ -292,8 +292,4 @@ except KeyboardInterrupt:
     # print('shutting down')
     logger.info('KeyboardInterrupt, shutting down...')
 except Exception as e:
-<<<<<<< HEAD
     logger.error("Exception occurred", exc_info=True)
-=======
-    logger.error("Exception occurred", exc_info=True)
->>>>>>> acc2552966e7b5c9425544c283866b273992d7f6
