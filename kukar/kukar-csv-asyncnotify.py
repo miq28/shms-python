@@ -111,9 +111,9 @@ DICT_FILES_TO_WATCH=os.path.join(
     )
 
 folders_to_watch = [
-    '/home/shms/ftp/2023-Kukar-Box1',
-    '/home/shms/ftp/2023-Kukar-Box2',
-    # '/home/shms/ftp/test',
+    '/ftp/2023-Kukar-Box1',
+    '/ftp/2023-Kukar-Box2',
+    # '/ftp/test',
 ]
 
 myjob = 0

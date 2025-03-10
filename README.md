@@ -39,3 +39,8 @@ sudo env PATH=$PATH:/home/shms/.nvm/versions/node/v14.19.1/bin /home/shms/.nvm/v
 ▶ pm2 start PDCM-Martadipura-Box1.py --watch
 ▶ pm2 start PDCM-Kembar-Box2.py --watch
 ```
+## InfluxDB 2.x OSS cheat sheet
+### Change retention policy using CLI. Cannot use GUI because there is bug. Issue: https://github.com/influxdata/ui/issues/1607
+```
+▶ influx bucket update -id <bucket_ID> --retention 0 --token <TOKEN> --host http://localhost:8086 --skip-verify
+```
