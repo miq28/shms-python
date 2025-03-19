@@ -44,3 +44,18 @@ sudo env PATH=$PATH:/home/shms/.nvm/versions/node/v14.19.1/bin /home/shms/.nvm/v
 ```
 ▶ influx bucket update -id <bucket_ID> --retention 0 --token <TOKEN> --host http://localhost:8086 --skip-verify
 ```
+## How to add private keys in Windows 11 using ssh-agent
+```
+ iqbal on  ~
+ # Get-Service -Name ssh-agent | Set-Service -StartupType Manual
+ iqbal on  ~
+ # Start-Service ssh-agent
+ iqbal on  ~
+ # ssh-add C:\Users\iqbal\.ssh\id_rsa-OpenSSH-format-openwrt-private-Key
+Identity added: C:\Users\iqbal\.ssh\id_rsa-OpenSSH-format-openwrt-private-Key (C:\Users\iqbal\.ssh\id_rsa-OpenSSH-format-openwrt-private-Key)
+```
+## How to add SSH Keys to authorized_keys file
+See https://askubuntu.com/a/262074
+```
+ iqbal on  ~ chmod 700 ~/.ssh && chmod 600 ~/.ssh/authorized_keys
+```
