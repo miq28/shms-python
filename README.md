@@ -40,6 +40,8 @@ sudo env PATH=$PATH:/home/shms/.nvm/versions/node/v14.19.1/bin /home/shms/.nvm/v
 ▶ pm2 start PDCM-Kembar-Box2.py --watch
 ```
 ## InfluxDB 2.x OSS cheat sheet
+### InfluxDB 2.7 does not support deleting data by field.
+See: https://docs.influxdata.com/influxdb/v2/write-data/delete-data/#cannot-delete-data-by-field
 ### Change retention policy using CLI. Cannot use GUI because there is bug. Issue: https://github.com/influxdata/ui/issues/1607
 ```
 ▶ influx bucket update -id <bucket_ID> --retention 0 --token <TOKEN> --host http://localhost:8086 --skip-verify
