@@ -59,3 +59,7 @@ See https://askubuntu.com/a/262074
 ```
  iqbal on  ~ chmod 700 ~/.ssh && chmod 600 ~/.ssh/authorized_keys
 ```
+## Copy folder while keeping permissions etc.
+```
+sudo cp -rp /home/shms/ftp/* /ftp
+```
