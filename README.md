@@ -65,3 +65,10 @@ See https://askubuntu.com/a/262074
 ```
 sudo cp -rp /home/shms/ftp/* /ftp
 ```
+## Check directory usage; Windirstat like
+Option 1: du command
+```
+du -h --max-depth=1 -t 1G / 2>/dev/null | sort -rh | head -10
+```
+Option 2: Use ncdu
+see: https://www.tecmint.com/ncdu-a-ncurses-based-disk-usage-analyzer-and-tracker/
